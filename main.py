@@ -8,9 +8,14 @@ app = Flask(__name__)
 @app.route("/generate_password")
 def generate_password():
     password_length = random.randint(10, 20)
-    symbols = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(symbols) for _ in range(password_length))
-
+    uppercase_letters = string.ascii_uppercase
+    lowercase_letters = string.ascii_lowercase
+    digits = string.digits
+    symbols = string.punctuation
+    required_symbols = random.choice(uppercase_letters) + random.choice(lowercase_letters) + random.choice(digits) + random.choice(symbols)
+    remaining_length = password_length - len(required_symbols)
+    remaining_password = ''.join(random.choice(uppercase_letters + lowercase_letters + digits + symbols) for _ in range(remaining_length))
+    password = required_symbols + remaining_password
     return password
 
 @app.route('/calculate_average')
