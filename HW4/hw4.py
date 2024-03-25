@@ -79,14 +79,19 @@ def stats_by_city():
     if not genre:
         return "Please indicate genre!"
     query = """
-    SELECT BillingCity FROM invoices
-    JOIN invoice_items ON invoices.InvoiceId = invoice_items.InvoiceId
-    JOIN tracks ON invoice_items.TrackId = tracks.TrackId
-    JOIN genres ON tracks.GenreId = genres.GenreId
-    WHERE genres.Name = ?
-    GROUP BY BillingCity
-    ORDER BY COUNT(*) DESC
-    LIMIT 1
+    WITH RankedCities AS (
+        SELECT BillingCity,
+        RANK() OVER (ORDER BY COUNT(*) DESC) as rank
+        FROM invoices
+        JOIN invoice_items ON invoices.InvoiceId = invoice_items.InvoiceId
+        JOIN tracks ON invoice_items.TrackId = tracks.TrackId
+        JOIN genres ON tracks.GenreId = genres.GenreId
+        WHERE genres.Name = ?
+        GROUP BY BillingCity
+    )
+    SELECT BillingCity
+    FROM RankedCities
+    WHERE rank = 1
     """
     result = execute_query(query=query, args=(genre,))
     return format_records(result)
