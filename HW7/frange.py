@@ -7,20 +7,21 @@ class frange:
         self.start = Decimal(str(start))
         self.stop = Decimal(str(stop))
         self.step = Decimal(str(step))
+        self.current = self.start
 
     def __iter__(self):
-        current = self.start
-        while (self.step > 0 and current < self.stop) or (self.step < 0 and current > self.stop):
-            yield float(current)
-            current += self.step
+        return self
+
+    def __next__(self):
+        if (self.step > 0 and self.current < self.stop) or (self.step < 0 and self.current > self.stop):
+            result = float(self.current)
+            self.current += self.step
+            return result
+        else:
+            raise StopIteration
 
 for i in frange(1, 100, 3.5):
     print(i)
-
-1
-4.5
-8.0
-...
 
 assert(list(frange(5)) == [0, 1, 2, 3, 4])
 assert(list(frange(2, 5)) == [2, 3, 4])
